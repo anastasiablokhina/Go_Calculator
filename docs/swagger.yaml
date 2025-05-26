@@ -1,0 +1,104 @@
+basePath: /
+definitions:
+  main.Command:
+    properties:
+      left: {}
+      op:
+        type: string
+      right: {}
+      type:
+        type: string
+      var:
+        type: string
+    type: object
+  main.Item:
+    properties:
+      value:
+        type: integer
+      var:
+        type: string
+    type: object
+  main.JRPCError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  main.JRPCRequest:
+    type: object
+  main.JRPCResponse:
+    properties:
+      error:
+        $ref: '#/definitions/main.JRPCError'
+      id: {}
+      jsonrpc:
+        type: string
+      result: {}
+    type: object
+  main.Output:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/main.Item'
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Calculator Application
+  title: Calculator App API
+  version: "1.0"
+paths:
+  /compute:
+    post:
+      consumes:
+      - application/json
+      description: Принимает список команд и возвращает результат вычислений
+      parameters:
+      - description: Список команд
+        in: body
+        name: commands
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/main.Command'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Output'
+        "400":
+          description: Ошибка в формате запроса
+          schema:
+            type: string
+      summary: Вычисление выражений
+  /jrpc:
+    post:
+      consumes:
+      - application/json
+      description: Принимает JSON-RPC запрос, выполняет команды и возвращает результат
+        вычислений
+      parameters:
+      - description: JSON-RPC запрос
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.JRPCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.JRPCResponse'
+        "400":
+          description: Ошибка в формате запроса
+          schema:
+            type: string
+      summary: Обработка JSON-RPC запроса
+swagger: "2.0"
